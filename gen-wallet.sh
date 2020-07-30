@@ -75,9 +75,13 @@ fi
 # Generate wallet
 
 clear
-echo "Generating wallet..."
 
+echo "Generating root key..."
 export p="$(echo -n "$seed" | unshare -r -n argon2 $salt -r $@ | ./bx mnemonic-new | ./bx mnemonic-to-seed | ./bx hd-new)"
+echo "Done!"
 
+echo "Importing root key into Electrum..."
 ./electrum --offline restore $p -w ~/.electrum/wallets/$name --password $pwd >/dev/null
-./electrum -w ~/.electrum/wallets/$name
+echo "Done!"
+
+nohup ./electrum -w ~/.electrum/wallets/$name >/dev/null 2>&1 &
