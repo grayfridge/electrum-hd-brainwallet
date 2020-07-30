@@ -2,6 +2,18 @@
 
 set -e 
 
+if [ "$#" -le 0 ]
+then
+    echo "usage: $0 (bip32|bip44|bip49|bip84) (argon2 args)"
+    exit
+fi
+
+if [[ ! "$1" =~ ^(bip32|bip44|bip49|bip84)$ ]]
+then
+    echo "invalid option $1"
+    exit
+fi
+
 # Check for argon2
 
 if ! command -v argon2 &> /dev/null
@@ -77,7 +89,13 @@ fi
 clear
 
 echo "Generating root key..."
-export p="$(echo -n "$seed" | unshare -r -n argon2 $salt -r $@ | ./bx mnemonic-new | ./bx mnemonic-to-seed | ./bx hd-new)"
+
+export bip32="echo -n "$seed" | unshare -r -n argon2 $salt -r ${@:2} | ./bx mnemonic-new | ./bx mnemonic-to-seed | ./bx hd-new"
+export bip44="$bip32 | ./bx hd-private -d -i 44 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0"
+export bip49="$bip32 -v 77428856 |./bx hd-private -d -i 49 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0" 
+export bip84="$bip32 -v 78791436 |./bx hd-private -d -i 84 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0"
+export p=$(eval "${!1}")
+
 echo "Done!"
 
 echo "Importing root key into Electrum..."
