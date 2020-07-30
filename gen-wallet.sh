@@ -48,7 +48,7 @@ fi
 
 read -p "Seed: " seed
 
-if ! [[ $seed =~ ^[a-z]+$ ]]
+if ! [[ $seed =~ ^[a-z[:space:]]+$ ]]
 then
     echo "Invalid seed."
     exit
