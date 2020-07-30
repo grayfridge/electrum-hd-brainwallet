@@ -90,16 +90,20 @@ clear
 
 echo "Generating root key..."
 
-export bip32="unshare -r -n argon2 $salt -r ${@:2} <<< "$seed" | ./bx mnemonic-new | ./bx mnemonic-to-seed | ./bx hd-new"
+export bip32="echo -n $seed | unshare -r -n argon2 $salt -r ${@:2} | ./bx mnemonic-new | ./bx mnemonic-to-seed | ./bx hd-new"
 export bip44="$bip32 | ./bx hd-private -d -i 44 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0"
 export bip49="$bip32 -v 77428856 |./bx hd-private -d -i 49 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0" 
 export bip84="$bip32 -v 78791436 |./bx hd-private -d -i 84 | ./bx hd-private -d -i 0 | ./bx hd-private -d -i 0"
-export p=$(eval "${!1}")
+export pkey=$(eval "${!1}")
 
 echo "Done!"
 
 echo "Importing root key into Electrum..."
-./electrum --offline restore $p -w ~/.electrum/wallets/$name --password $pwd >/dev/null
+(cat <<END
+$pkey
+$passwd
+END
+) | ./electrum --offline restore -w ~/.electrum/wallets/$name ? --password ? >/dev/null 
 echo "Done!"
 
 nohup ./electrum -w ~/.electrum/wallets/$name >/dev/null 2>&1 &
