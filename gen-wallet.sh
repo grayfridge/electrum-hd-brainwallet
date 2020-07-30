@@ -26,8 +26,8 @@ fi
 if [ ! -f "./bx-linux-x64-qrcode" ]
 then
     wget -N https://github.com/libbitcoin/libbitcoin-explorer/releases/download/v3.2.0/bx-linux-x64-qrcode 
-    chmod +x ./bx-linux-x64-qrcode
-    
+    chmod +x ./bx-linux-x64-qrcode    
+
     echo "#!/bin/bash" > bx
     echo "unshare -r -n ./bx-linux-x64-qrcode \$@" >> bx
     
@@ -50,7 +50,7 @@ fi
 
 # Read wallet file
 
-if [ -f "~/.electrum/wallets/$name" ]
+if [ -f ~/.electrum/wallets/$name ]
 then
     echo "This wallet already exists."
     exit
@@ -101,7 +101,7 @@ echo "Done!"
 echo "Importing root key into Electrum..."
 (cat <<END
 $pkey
-$passwd
+$pwd
 END
 ) | ./electrum --offline restore -w ~/.electrum/wallets/$name ? --password ? >/dev/null 
 echo "Done!"
