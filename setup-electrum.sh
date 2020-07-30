@@ -105,7 +105,7 @@ fi
 
 # Create nice default config
 
-mkdir -p ~/.electrum/
+mkdir -p ~/.electrum/wallets
 cat >~/.electrum/config <<EOF
 {
     "auto_connect": true,
